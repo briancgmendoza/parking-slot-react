@@ -1,0 +1,9 @@
+# parking-slot-react
+ReactJS, Webpack 5, SASS and SEO. 
+
+Work in Progress.
+
+Things to do:
+1. Finish the computation
+2. Adjust the styling
+3. Clean the code
