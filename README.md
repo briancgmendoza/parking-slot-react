@@ -1,7 +1,7 @@
 # parking-slot-react
-ReactJS, Webpack 5, SASS and SEO. 
+ReactJS, Webpack 5, SASS and non-responsive site. 
 
-Work in Progress.
+Work in Progress. 
 
 Things to do:
 1. Finish the computation
