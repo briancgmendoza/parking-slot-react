@@ -90,13 +90,30 @@ const app = () => {
     },
   ]);
 
-  // React.useEffect(() => {}, parkingData);
+  // const [dateTime, setDateTime] = React.useState(new Date());
+
+  // React.useEffect(() => {
+  //   const updateTime = () => {
+  //     setInterval(() => {
+  //       const currentDate = new Date().toLocaleDateString();
+  //       setDateTime({ date: currentDate });
+  //     }, 1000);
+  //   };
+
+  //   updateTime();
+  // }, [dateTime]);
+
+  const currentDate = new Date();
 
   const [formRadio, setFormRadio] = React.useState([
     {
       vehicleType: 0,
       entryPoint: "",
-      plateNumber: "",
+      date: `${
+        currentDate.getMonth() + 1
+      }/${currentDate.getDate()}/${currentDate.getFullYear()} ${
+        currentDate.getHours() / 2
+      }:${currentDate.getMinutes()}:${currentDate.getSeconds()}`,
     },
   ]);
 
@@ -118,9 +135,7 @@ const app = () => {
             Number(formRadio[magicNumber].vehicleType)
           ) {
             if (parkingData[i].slots[j].list.length !== 3) {
-              parkingData[i].slots[j].list.push(
-                formRadio[magicNumber].plateNumber
-              );
+              parkingData[i].slots[j].list.push(formRadio[magicNumber].date);
 
               setParkingData([...parkingData]);
             } else {
@@ -131,6 +146,27 @@ const app = () => {
       }
     }
   };
+
+  const handleUnPark = (index) => {
+    const getSelectedCar = document
+      .getElementById(index)
+      .getAttribute("data-value");
+
+    for (let i = 0; i < parkingData.length; i++) {
+      for (let j = 0; j < parkingData[i].slots.length; j++) {
+        if (parkingData[i].slots[j].list.includes(getSelectedCar)) {
+          // parkingData[i].slots[j].list.filter(
+          //   (e) => e !== getSelectedCar.toString()
+          // );
+
+          parkingData[i].slots[j].list.splice(index);
+
+          setParkingData([...parkingData]);
+        }
+      }
+    }
+  };
+
   return (
     <section className={styles.container}>
       <div className={styles.outterContainer}>
@@ -149,7 +185,16 @@ const app = () => {
                     </p>
                     <ul className={styles.list}>
                       {slot.list.map((list, i) => {
-                        return <li key={i}>{list}</li>;
+                        return (
+                          <li
+                            id={i}
+                            key={i}
+                            data-value={list}
+                            onClick={() => handleUnPark(i)}
+                          >
+                            {list}
+                          </li>
+                        );
                       })}
                     </ul>
 
@@ -235,15 +280,15 @@ const app = () => {
               </div>
 
               <div>
-                <label htmlFor="plateNumber">Plate Number:</label>
+                <label htmlFor="plateNumber">Current Date & Time:</label>
                 <input
                   type="text"
-                  placeholder="Ex: ABC123"
-                  value={data.plateNumber}
+                  placeholder={`${data.date}`}
+                  value={data.date}
                   onChange={(e) => handleChange(index, e)}
-                  name="plateNumber"
-                  className={styles.input}
-                  required
+                  name="date"
+                  className={`${styles.input} ${styles.date}`}
+                  disabled
                 />
               </div>
             </div>
@@ -252,7 +297,7 @@ const app = () => {
 
         <div>
           <button type="submit" className={styles.btnSubmit}>
-            Submit
+            Park
           </button>
           <button
             type="reset"
@@ -262,7 +307,6 @@ const app = () => {
                 {
                   vehicleType: 0,
                   entryPoint: "",
-                  plateNumber: "",
                 },
               ])
             }

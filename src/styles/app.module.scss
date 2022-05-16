@@ -40,6 +40,13 @@
 
         .list {
           margin-left: 1.5rem;
+          cursor: pointer;
+
+          > li {
+            &:hover {
+              color: var(--color-full);
+            }
+          }
         }
 
         .fullSlot {
@@ -63,6 +70,13 @@
     .input {
       margin-left: 0.5rem;
       padding: 0.3rem 0.5rem;
+    }
+
+    .input.date {
+      width: 9rem;
+      text-align: center;
+      color: var(--color-white-text);
+      pointer-events: none;
     }
 
     .btnSubmit,
