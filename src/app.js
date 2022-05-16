@@ -30,19 +30,16 @@ const app = () => {
         {
           slotType: 0,
           name: "Small (SP)",
-          availableSlot: 3,
           list: [],
         },
         {
           slotType: 1,
           name: "Medium (MP)",
-          availableSlot: 3,
           list: [],
         },
         {
           slotType: 2,
           name: "Large (LP)",
-          availableSlot: 3,
           list: [],
         },
       ],
@@ -55,19 +52,16 @@ const app = () => {
         {
           slotType: 0,
           name: "Small (SP)",
-          availableSlot: 3,
           list: [],
         },
         {
           slotType: 1,
           name: "Medium (MP)",
-          availableSlot: 3,
           list: [],
         },
         {
           slotType: 2,
           name: "Large (LP)",
-          availableSlot: 3,
           list: [],
         },
       ],
@@ -80,24 +74,23 @@ const app = () => {
         {
           slotType: 0,
           name: "Small (SP)",
-          availableSlot: 3,
           list: [],
         },
         {
           slotType: 1,
           name: "Medium (MP)",
-          availableSlot: 3,
           list: [],
         },
         {
           slotType: 2,
           name: "Large (LP)",
-          availableSlot: 3,
           list: [],
         },
       ],
     },
   ]);
+
+  // React.useEffect(() => {}, parkingData);
 
   const [formRadio, setFormRadio] = React.useState([
     {
@@ -124,15 +117,19 @@ const app = () => {
             parkingData[i].slots[j].slotType ===
             Number(formRadio[magicNumber].vehicleType)
           ) {
-            parkingData[i].slots[j].list.push(
-              formRadio[magicNumber].plateNumber
-            );
+            if (parkingData[i].slots[j].list.length !== 3) {
+              parkingData[i].slots[j].list.push(
+                formRadio[magicNumber].plateNumber
+              );
+
+              setParkingData([...parkingData]);
+            } else {
+              alert("Parking space is full!");
+            }
           }
         }
       }
     }
-
-    console.log(parkingData);
   };
   return (
     <section className={styles.container}>
@@ -150,21 +147,15 @@ const app = () => {
                       <span className={styles.slotType}>Slot Type: </span>
                       {slot.name}
                     </p>
-                    <ul>
+                    <ul className={styles.list}>
                       {slot.list.map((list, i) => {
                         return <li key={i}>{list}</li>;
                       })}
                     </ul>
-                    {/* <p>
-                      <span className={styles.availableSlot}>
-                        Available Slots:{" "}
-                      </span>
-                      {slot.availableSlot}
-                    </p>
 
-                    {data.list.length === 3 && (
+                    {slot.list.length === 3 && (
                       <p className={styles.fullSlot}>Full!</p>
-                    )} */}
+                    )}
                   </div>
                 );
               })}
