@@ -4,7 +4,7 @@ import styles from "./styles/app.module.scss";
 
 /** Objective checklist:
  * 1. 3 Entry Points
- * 2. Type of Vehicles: S - Small, M - Medium & L - Large //TODO:
+ * 2. Type of Vehicles: S - Small, M - Medium & L - Large
  * 3. Type of Slots: SP - Small, MP - Medium & LP - Large
  * 4. Calculation fees - Flat rate 40 pesos for first 3 hours //TODO:
  *    Exceeding hourly rate (PARKED in & Regardless of vehicle size):
@@ -15,8 +15,8 @@ import styles from "./styles/app.module.scss";
  * 5. Vehicle leaving and returning within one hour must be charged //TODO:
  *    continuous rate ---- * Problem: how to keep track? Before leaving, prompt the user
  *    whether not coming back or coming back?
- * 6. 0 small, 1 medium & 2 large //TODO:
- * 7. Show user if the slot is available or not //TODO:
+ * 6. 0 small, 1 medium & 2 large
+ * 7. Show user if the slot is available or not
  * 8. Park and unpark //TODO:
  */
 
@@ -30,19 +30,16 @@ const app = () => {
         {
           slotType: 0,
           name: "Small (SP)",
-          availableSlot: 3,
           list: [],
         },
         {
           slotType: 1,
           name: "Medium (MP)",
-          availableSlot: 3,
           list: [],
         },
         {
           slotType: 2,
           name: "Large (LP)",
-          availableSlot: 3,
           list: [],
         },
       ],
@@ -55,19 +52,16 @@ const app = () => {
         {
           slotType: 0,
           name: "Small (SP)",
-          availableSlot: 3,
           list: [],
         },
         {
           slotType: 1,
           name: "Medium (MP)",
-          availableSlot: 3,
           list: [],
         },
         {
           slotType: 2,
           name: "Large (LP)",
-          availableSlot: 3,
           list: [],
         },
       ],
@@ -80,30 +74,46 @@ const app = () => {
         {
           slotType: 0,
           name: "Small (SP)",
-          availableSlot: 3,
           list: [],
         },
         {
           slotType: 1,
           name: "Medium (MP)",
-          availableSlot: 3,
           list: [],
         },
         {
           slotType: 2,
           name: "Large (LP)",
-          availableSlot: 3,
           list: [],
         },
       ],
     },
   ]);
 
+  // const [dateTime, setDateTime] = React.useState(new Date());
+
+  // React.useEffect(() => {
+  //   const updateTime = () => {
+  //     setInterval(() => {
+  //       const currentDate = new Date().toLocaleDateString();
+  //       setDateTime({ date: currentDate });
+  //     }, 1000);
+  //   };
+
+  //   updateTime();
+  // }, [dateTime]);
+
+  const currentDate = new Date();
+
   const [formRadio, setFormRadio] = React.useState([
     {
       vehicleType: 0,
       entryPoint: "",
-      plateNumber: "",
+      date: `${
+        currentDate.getMonth() + 1
+      }/${currentDate.getDate()}/${currentDate.getFullYear()} ${
+        currentDate.getHours() / 2
+      }:${currentDate.getMinutes()}:${currentDate.getSeconds()}`,
     },
   ]);
 
@@ -124,16 +134,82 @@ const app = () => {
             parkingData[i].slots[j].slotType ===
             Number(formRadio[magicNumber].vehicleType)
           ) {
-            parkingData[i].slots[j].list.push(
-              formRadio[magicNumber].plateNumber
-            );
+            if (parkingData[i].slots[j].list.length !== 3) {
+              parkingData[i].slots[j].list.push(formRadio[magicNumber].date);
+
+              setParkingData([...parkingData]);
+            } else {
+              alert("Parking space is full!");
+            }
+          }
+        }
+      }
+    }
+  };
+
+  const handleCompute = (vehicleType) => {
+    let remainingTime = currentDate - formRadio.date;
+    let is24H = 1000 * 60 * 24;
+    let is1H = 1000 * 60;
+    let charges = 0;
+
+    let hourlyCharge = 0;
+
+    if (vehicleType === 0) {
+      hourlyCharge = 20;
+    } else if (vehicleType === 1) {
+      hourlyCharge = 60;
+    } else if (vehicleType === 2) {
+      hourlyCharge = 100;
+    }
+
+    if (remainingTime > is24H) {
+      let nth = parseInt(totalTime / is24H);
+      charges += nth * 5000;
+      remainingTime -= nth * is24H;
+    }
+
+    if (remainingTime > is1H * 3) {
+      remainingTime -= is1H * 3;
+      charges += 40;
+    }
+
+    if (remainingTime > 0) {
+      let remainingHours = Math.ceil(remainingTime / is1H);
+      charges += remainingHours * hourlyCharge;
+    }
+
+    // return total charges
+    return alert(`Your bill is ${charges}`);
+  };
+
+  const handleUnPark = (index) => {
+    const getSelectedCar = document
+      .getElementById(index)
+      .getAttribute("data-value");
+
+    const getSlotType = document
+      .getElementById(index)
+      .getAttribute("data-slottype");
+
+    const getName = document.getElementById(index).getAttribute("data-name");
+
+    for (let i = 0; i < parkingData.length; i++) {
+      if (parkingData[i].entryPoint === getName) {
+        for (let j = 0; j < parkingData[i].slots.length; j++) {
+          if (parkingData[i].slots[j].slotType === Number(getSlotType)) {
+            if (parkingData[i].slots[j].list.includes(getSelectedCar)) {
+              parkingData[i].slots[j].list.splice(index);
+              setParkingData([...parkingData]);
+            }
           }
         }
       }
     }
 
-    console.log(parkingData);
+    handleCompute(getSlotType);
   };
+
   return (
     <section className={styles.container}>
       <div className={styles.outterContainer}>
@@ -150,21 +226,26 @@ const app = () => {
                       <span className={styles.slotType}>Slot Type: </span>
                       {slot.name}
                     </p>
-                    <ul>
+                    <ul className={styles.list}>
                       {slot.list.map((list, i) => {
-                        return <li key={i}>{list}</li>;
+                        return (
+                          <li
+                            id={i}
+                            key={i}
+                            data-value={list}
+                            data-slottype={slot.slotType}
+                            data-name={data.entryPoint}
+                            onClick={() => handleUnPark(i)}
+                          >
+                            {list}
+                          </li>
+                        );
                       })}
                     </ul>
-                    {/* <p>
-                      <span className={styles.availableSlot}>
-                        Available Slots:{" "}
-                      </span>
-                      {slot.availableSlot}
-                    </p>
 
-                    {data.list.length === 3 && (
+                    {slot.list.length === 3 && (
                       <p className={styles.fullSlot}>Full!</p>
-                    )} */}
+                    )}
                   </div>
                 );
               })}
@@ -244,15 +325,15 @@ const app = () => {
               </div>
 
               <div>
-                <label htmlFor="plateNumber">Plate Number:</label>
+                <label htmlFor="plateNumber">Current Date & Time:</label>
                 <input
                   type="text"
-                  placeholder="Ex: ABC123"
-                  value={data.plateNumber}
+                  placeholder={`${data.date}`}
+                  value={data.date}
                   onChange={(e) => handleChange(index, e)}
-                  name="plateNumber"
-                  className={styles.input}
-                  required
+                  name="date"
+                  className={`${styles.input} ${styles.date}`}
+                  disabled
                 />
               </div>
             </div>
@@ -261,7 +342,7 @@ const app = () => {
 
         <div>
           <button type="submit" className={styles.btnSubmit}>
-            Submit
+            Park
           </button>
           <button
             type="reset"
@@ -271,7 +352,6 @@ const app = () => {
                 {
                   vehicleType: 0,
                   entryPoint: "",
-                  plateNumber: "",
                 },
               ])
             }
