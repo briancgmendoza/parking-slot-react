@@ -147,6 +147,42 @@ const app = () => {
     }
   };
 
+  const handleCompute = (vehicleType) => {
+    let remainingTime = currentDate - formRadio.date;
+    let is24H = 1000 * 60 * 24;
+    let is1H = 1000 * 60;
+    let charges = 0;
+
+    let hourlyCharge = 0;
+
+    if (vehicleType === 0) {
+      hourlyCharge = 20;
+    } else if (vehicleType === 1) {
+      hourlyCharge = 60;
+    } else if (vehicleType === 2) {
+      hourlyCharge = 100;
+    }
+
+    if (remainingTime > is24H) {
+      let nth = parseInt(totalTime / is24H);
+      charges += nth * 5000;
+      remainingTime -= nth * is24H;
+    }
+
+    if (remainingTime > is1H * 3) {
+      remainingTime -= is1H * 3;
+      charges += 40;
+    }
+
+    if (remainingTime > 0) {
+      let remainingHours = Math.ceil(remainingTime / is1H);
+      charges += remainingHours * hourlyCharge;
+    }
+
+    // return total charges
+    return alert(`Your bill is ${charges}`);
+  };
+
   const handleUnPark = (index) => {
     const getSelectedCar = document
       .getElementById(index)
@@ -170,6 +206,8 @@ const app = () => {
         }
       }
     }
+
+    handleCompute(getSlotType);
   };
 
   return (
