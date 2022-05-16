@@ -4,7 +4,7 @@ import styles from "./styles/app.module.scss";
 
 /** Objective checklist:
  * 1. 3 Entry Points
- * 2. Type of Vehicles: S - Small, M - Medium & L - Large //TODO:
+ * 2. Type of Vehicles: S - Small, M - Medium & L - Large
  * 3. Type of Slots: SP - Small, MP - Medium & LP - Large
  * 4. Calculation fees - Flat rate 40 pesos for first 3 hours //TODO:
  *    Exceeding hourly rate (PARKED in & Regardless of vehicle size):
@@ -15,8 +15,8 @@ import styles from "./styles/app.module.scss";
  * 5. Vehicle leaving and returning within one hour must be charged //TODO:
  *    continuous rate ---- * Problem: how to keep track? Before leaving, prompt the user
  *    whether not coming back or coming back?
- * 6. 0 small, 1 medium & 2 large //TODO:
- * 7. Show user if the slot is available or not //TODO:
+ * 6. 0 small, 1 medium & 2 large
+ * 7. Show user if the slot is available or not
  * 8. Park and unpark //TODO:
  */
 
@@ -152,16 +152,21 @@ const app = () => {
       .getElementById(index)
       .getAttribute("data-value");
 
+    const getSlotType = document
+      .getElementById(index)
+      .getAttribute("data-slottype");
+
+    const getName = document.getElementById(index).getAttribute("data-name");
+
     for (let i = 0; i < parkingData.length; i++) {
-      for (let j = 0; j < parkingData[i].slots.length; j++) {
-        if (parkingData[i].slots[j].list.includes(getSelectedCar)) {
-          // parkingData[i].slots[j].list.filter(
-          //   (e) => e !== getSelectedCar.toString()
-          // );
-
-          parkingData[i].slots[j].list.splice(index);
-
-          setParkingData([...parkingData]);
+      if (parkingData[i].entryPoint === getName) {
+        for (let j = 0; j < parkingData[i].slots.length; j++) {
+          if (parkingData[i].slots[j].slotType === Number(getSlotType)) {
+            if (parkingData[i].slots[j].list.includes(getSelectedCar)) {
+              parkingData[i].slots[j].list.splice(index);
+              setParkingData([...parkingData]);
+            }
+          }
         }
       }
     }
@@ -190,6 +195,8 @@ const app = () => {
                             id={i}
                             key={i}
                             data-value={list}
+                            data-slottype={slot.slotType}
+                            data-name={data.entryPoint}
                             onClick={() => handleUnPark(i)}
                           >
                             {list}
