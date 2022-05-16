@@ -111,9 +111,7 @@ const app = () => {
       entryPoint: "",
       date: `${
         currentDate.getMonth() + 1
-      }/${currentDate.getDate()}/${currentDate.getFullYear()} ${
-        currentDate.getHours() / 2
-      }:${currentDate.getMinutes()}:${currentDate.getSeconds()}`,
+      }/${currentDate.getDate()}/${currentDate.getFullYear()} ${currentDate.getHours()}:${currentDate.getMinutes()}:${currentDate.getSeconds()}`,
     },
   ]);
 
@@ -148,39 +146,79 @@ const app = () => {
   };
 
   const handleCompute = (vehicleType) => {
-    let remainingTime = currentDate - formRadio.date;
+    const currentDate = new Date();
+    const magicNumber = 0;
+    const getMyTime = formRadio[magicNumber].date;
+    const magicHour = getHourNow === 0 ? 8 : 7;
+    const getSeconds = Number(currentDate.getSeconds());
+    const magicMinute = getSeconds <= 9 ? 4 : 5;
+    const startIndex = 0;
+    const endIndex = getHourNow === 0 ? 2 : 1;
+
+    // Current Hour & Minutes
+    const getHourNow =
+      Number(currentDate.getHours()) === 0
+        ? 12
+        : Number(currentDate.getHours());
+
+    const getMinutesNow = Number(currentDate.getMinutes());
+
+    // Login time of each car
+    const startedHour =
+      Number(
+        getMyTime
+          .substring(getMyTime.length - magicHour)
+          .substring(startIndex, endIndex)
+      ) === 0
+        ? 12
+        : Number(
+            getMyTime
+              .substring(getMyTime.length - magicHour)
+              .substring(startIndex, endIndex)
+          );
+
+    const startedMinutes = Number(
+      getMyTime
+        .substring(getMyTime.length - magicMinute)
+        .substring(startIndex, 2)
+    );
+
+    let remainingHour = getHourNow - startedHour;
+    let remainingMinutes = getMinutesNow - startedMinutes;
+
     let is24H = 1000 * 60 * 24;
     let is1H = 1000 * 60;
-    let charges = 0;
 
+    let charges = 0;
     let hourlyCharge = 0;
 
-    if (vehicleType === 0) {
+    if (Number(vehicleType) === 0) {
       hourlyCharge = 20;
-    } else if (vehicleType === 1) {
+      console.log(hourlyCharge);
+    } else if (Number(vehicleType) === 1) {
       hourlyCharge = 60;
-    } else if (vehicleType === 2) {
+      console.log(hourlyCharge);
+    } else if (Number(vehicleType) === 2) {
       hourlyCharge = 100;
+      console.log(hourlyCharge);
     }
 
-    if (remainingTime > is24H) {
-      let nth = parseInt(totalTime / is24H);
+    if (remainingHour > is24H) {
+      let nth = parseInt(remainingHour / is24H);
       charges += nth * 5000;
-      remainingTime -= nth * is24H;
+      remainingHour -= nth * is24H;
     }
 
-    if (remainingTime > is1H * 3) {
-      remainingTime -= is1H * 3;
+    if (remainingHour > is1H * 3) {
+      remainingHour -= is1H * 3;
       charges += 40;
     }
 
-    if (remainingTime > 0) {
-      let remainingHours = Math.ceil(remainingTime / is1H);
-      charges += remainingHours * hourlyCharge;
+    if (remainingHour === 0) {
+      charges = hourlyCharge;
     }
 
-    // return total charges
-    return alert(`Your bill is ${charges}`);
+    return alert(`Your bill is ${charges} pesos`);
   };
 
   const handleUnPark = (index) => {
