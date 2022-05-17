@@ -17,7 +17,7 @@ import styles from "./styles/app.module.scss";
  *    whether not coming back or coming back?
  * 6. 0 small, 1 medium & 2 large
  * 7. Show user if the slot is available or not
- * 8. Park and unpark //TODO:
+ * 8. Park and unpark
  */
 
 const app = () => {
@@ -90,19 +90,6 @@ const app = () => {
     },
   ]);
 
-  // const [dateTime, setDateTime] = React.useState(new Date());
-
-  // React.useEffect(() => {
-  //   const updateTime = () => {
-  //     setInterval(() => {
-  //       const currentDate = new Date().toLocaleDateString();
-  //       setDateTime({ date: currentDate });
-  //     }, 1000);
-  //   };
-
-  //   updateTime();
-  // }, [dateTime]);
-
   const currentDate = new Date();
 
   const [formRadio, setFormRadio] = React.useState([
@@ -149,11 +136,11 @@ const app = () => {
     const currentDate = new Date();
     const magicNumber = 0;
     const getMyTime = formRadio[magicNumber].date;
-    const magicHour = getHourNow === 0 ? 8 : 7;
+    const magicHour = getHourNow === 12 ? 7 : 8;
     const getSeconds = Number(currentDate.getSeconds());
     const magicMinute = getSeconds <= 9 ? 4 : 5;
     const startIndex = 0;
-    const endIndex = getHourNow === 0 ? 2 : 1;
+    const endIndex = getHourNow === 12 ? 1 : 2;
 
     // Current Hour & Minutes
     const getHourNow =
@@ -162,6 +149,9 @@ const app = () => {
         : Number(currentDate.getHours());
 
     const getMinutesNow = Number(currentDate.getMinutes());
+
+    console.log("GetHourNow", getHourNow);
+    console.log("getMinutesNow", getMinutesNow);
 
     // Login time of each car
     const startedHour =
@@ -180,8 +170,11 @@ const app = () => {
     const startedMinutes = Number(
       getMyTime
         .substring(getMyTime.length - magicMinute)
-        .substring(startIndex, 2)
+        .substring(startIndex, endIndex)
     );
+
+    console.log("startedHour", startedHour);
+    console.log("startedMinutes", startedMinutes);
 
     let remainingHour = getHourNow - startedHour;
     let remainingMinutes = getMinutesNow - startedMinutes;
@@ -191,6 +184,12 @@ const app = () => {
 
     let charges = 0;
     let hourlyCharge = 0;
+    const flatRate = 40;
+
+    // Flat rate
+    if (remainingHour <= 180) {
+      charges = flatRate;
+    }
 
     if (Number(vehicleType) === 0) {
       hourlyCharge = 20;
@@ -203,41 +202,39 @@ const app = () => {
       console.log(hourlyCharge);
     }
 
+    // Succeeding hour
+    if (remainingHour > is1H * 3) {
+      remainingHour -= is1H * 3;
+      charges += 40;
+    }
+
+    // 24h
     if (remainingHour > is24H) {
       let nth = parseInt(remainingHour / is24H);
       charges += nth * 5000;
       remainingHour -= nth * is24H;
     }
 
-    if (remainingHour > is1H * 3) {
-      remainingHour -= is1H * 3;
-      charges += 40;
-    }
-
-    if (remainingHour === 0) {
-      charges = hourlyCharge;
-    }
-
     return alert(`Your bill is ${charges} pesos`);
   };
 
-  const handleUnPark = (index) => {
+  const handleUnPark = (name, index) => {
     const getSelectedCar = document
-      .getElementById(index)
+      .getElementById(name)
       .getAttribute("data-value");
 
     const getSlotType = document
-      .getElementById(index)
+      .getElementById(name)
       .getAttribute("data-slottype");
 
-    const getName = document.getElementById(index).getAttribute("data-name");
+    const getName = document.getElementById(name).getAttribute("data-name");
 
     for (let i = 0; i < parkingData.length; i++) {
       if (parkingData[i].entryPoint === getName) {
         for (let j = 0; j < parkingData[i].slots.length; j++) {
           if (parkingData[i].slots[j].slotType === Number(getSlotType)) {
             if (parkingData[i].slots[j].list.includes(getSelectedCar)) {
-              parkingData[i].slots[j].list.splice(index);
+              parkingData[i].slots[j].list.splice(index, 1);
               setParkingData([...parkingData]);
             }
           }
@@ -245,7 +242,7 @@ const app = () => {
       }
     }
 
-    handleCompute(getSlotType);
+    handleCompute(Number(getSlotType), getName);
   };
 
   return (
@@ -268,12 +265,12 @@ const app = () => {
                       {slot.list.map((list, i) => {
                         return (
                           <li
-                            id={i}
+                            id={slot.name}
                             key={i}
                             data-value={list}
                             data-slottype={slot.slotType}
                             data-name={data.entryPoint}
-                            onClick={() => handleUnPark(i)}
+                            onClick={() => handleUnPark(slot.name, i)}
                           >
                             {list}
                           </li>
